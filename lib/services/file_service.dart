@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:logger/logger.dart';
 import 'package:hashlib/hashlib.dart';
-import 'package:hashlib/codecs.dart';
 import '../utils/folder_manager.dart';
 
 class FileService {
@@ -26,7 +25,6 @@ class FileService {
 
   Future<String> generateCRC32(File file) async {
     try {
-      final fileLength = await file.length();
 
       // Read entire file and compute CRC32
       final bytes = await file.readAsBytes();
@@ -223,7 +221,7 @@ class FileService {
             await _logOperation(brand, model, logEntry, customBaseDir: customBaseDir);
           }
           // Save CRC32 hash file
-          final hashFile = File('${newPath}.crc32');
+          final hashFile = File("$newPath.crc32");
           final content = 'Filename: $entityName\nCRC32: $crc32\n';
           await hashFile.writeAsString(content, flush: true);
         } else if (entity is Directory) {

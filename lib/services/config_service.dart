@@ -33,6 +33,6 @@ class ConfigService {
 
   Future<List<String>> getModels(String brand) async {
     final config = await getConfig();
-    return List<String>.from(config['${brand}-models'] ?? []);
+    return List<String>.from(config['$brand-models'] ?? []);
   }
 }

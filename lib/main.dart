@@ -1,13 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:path/path.dart' as path;
-import 'package:server/screens/BackupViewerScreen.dart';
-import 'package:server/services/ClipboardService.dart';
+import 'package:server/screens/backup_viewer_screen.dart';
+import 'package:server/services/clipboard_service.dart';
 import 'package:server/utils/folder_manager.dart';
-import 'screens/BrandSelectionScreen.dart';
-import 'services/file_service.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
