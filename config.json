@@ -1,0 +1,5 @@
+{
+  "brands": ["Walton", "Marcel"],
+  "Walton-models": ["ModelA", "ModelB", "ModelC"],
+  "Marcel-models": ["ModelX", "ModelY"]
+}
