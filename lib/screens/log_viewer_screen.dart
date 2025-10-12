@@ -9,7 +9,7 @@ class LogViewerScreen extends StatefulWidget {
   final String brand;
   final String model;
 
-  LogViewerScreen({
+  const LogViewerScreen({super.key,
     required this.fileName,
     required this.filePath,
     required this.brand,
@@ -17,10 +17,10 @@ class LogViewerScreen extends StatefulWidget {
   });
 
   @override
-  _LogViewerScreenState createState() => _LogViewerScreenState();
+  LogViewerScreenState createState() => LogViewerScreenState();
 }
 
-class _LogViewerScreenState extends State<LogViewerScreen>
+class LogViewerScreenState extends State<LogViewerScreen>
     with SingleTickerProviderStateMixin {
   late Future<String> logContentFuture;
   late AnimationController _animationController;
@@ -176,7 +176,7 @@ class _LogViewerScreenState extends State<LogViewerScreen>
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -235,7 +235,7 @@ class _LogViewerScreenState extends State<LogViewerScreen>
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: _autoRefresh
-                                ? const Color(0xFF10B981).withOpacity(0.1)
+                                ? const Color(0xFF10B981).withValues(alpha: 0.1)
                                 : Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
@@ -259,7 +259,7 @@ class _LogViewerScreenState extends State<LogViewerScreen>
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1).withOpacity(0.1),
+                            color: const Color(0xFF6366F1).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: const Color(0xFF6366F1)),
                           ),
@@ -336,7 +336,7 @@ class _LogViewerScreenState extends State<LogViewerScreen>
                             Container(
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withOpacity(0.1),
+                                color: const Color(0xFF10B981).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               child: const Icon(
@@ -380,11 +380,11 @@ class _LogViewerScreenState extends State<LogViewerScreen>
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: entry.type.color.withOpacity(0.3),
+                                  color: entry.type.color.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(16),
-                                color: entry.type.color.withOpacity(0.05),
+                                color: entry.type.color.withValues(alpha: 0.05),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -392,7 +392,7 @@ class _LogViewerScreenState extends State<LogViewerScreen>
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: entry.type.color.withOpacity(0.1),
+                                      color: entry.type.color.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(

@@ -1,37 +1,17 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:ffi/ffi.dart';
-import 'package:win32/win32.dart';
 
 import '../services/config_service.dart';
 
-
-const _INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF;
-const _FILE_ATTRIBUTE_READONLY = 0x1;
 
 class FolderManager {
   static const String logFileName = 'operations.log';
   static const String modelLogFileName = 'model_operations.log';
   final ConfigService configService = ConfigService();
 
-  int Function(Pointer<Utf16>)? _getFileAttributes;
-  int Function(Pointer<Utf16>, int)? _setFileAttributes;
 
-  void _initializeWinAPI() {
-    final kernel32 = DynamicLibrary.open('kernel32.dll');
-    _getFileAttributes = kernel32.lookupFunction<
-        Uint32 Function(Pointer<Utf16>),
-        int Function(Pointer<Utf16>)
-    >('GetFileAttributesW');
-
-    _setFileAttributes = kernel32.lookupFunction<
-        Int32 Function(Pointer<Utf16>, Uint32),
-        int Function(Pointer<Utf16>, int)
-    >('SetFileAttributesW');
-  }
 
   Future<String> get appDataPath async {
     if (Platform.isWindows) {

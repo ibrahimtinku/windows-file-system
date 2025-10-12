@@ -9,7 +9,7 @@ import 'package:server/utils/folder_manager.dart';
 import 'package:server/services/file_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'FileViewerScreen.dart';
+import 'file_viewer_screen.dart';
 import 'package:lottie/lottie.dart';
 
 class CustomFilePickerDialog extends StatefulWidget {
@@ -19,12 +19,12 @@ class CustomFilePickerDialog extends StatefulWidget {
   final String? initialDirectory;
 
   const CustomFilePickerDialog({
-    Key? key,
+    super.key,
     required this.title,
     this.allowFiles = true,
     this.allowFolders = true,
     this.initialDirectory,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomFilePickerDialog> createState() => _CustomFilePickerDialogState();
@@ -530,10 +530,10 @@ class BackupViewerScreen extends StatefulWidget {
   const BackupViewerScreen({super.key});
 
   @override
-  _BackupViewerScreenState createState() => _BackupViewerScreenState();
+  BackupViewerScreenState createState() => BackupViewerScreenState();
 }
 
-class _BackupViewerScreenState extends State<BackupViewerScreen> {
+class BackupViewerScreenState extends State<BackupViewerScreen> {
   Directory? _selectedBackupDir;
   List<FileSystemEntity> _contents = [];
   final FileService _fileService = FileService();
@@ -580,7 +580,7 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
         final brands = List<String>.from(config['brands']);
         final models = <String, List<String>>{};
         for (var brand in brands) {
-          final modelKey = '${brand}-models';
+          final modelKey = '$brand-models';
           if (config.containsKey(modelKey) && config[modelKey] != null) {
             models[brand] = List<String>.from(config[modelKey]);
           } else {
@@ -632,7 +632,7 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
           final brands = List<String>.from(config['brands'] ?? []);
           final models = <String, List<String>>{};
           for (var brand in brands) {
-            final modelKey = '${brand}-models';
+            final modelKey = '$brand-models';
             models[brand] = List<String>.from(config[modelKey] ?? []);
           }
           final softwareHashes = <String, Map<String, String>>{};
@@ -984,7 +984,7 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
 
       // Validate all files before copying
       final isValid = await _validateFiles(filesToValidate, brand, model);
-      if (!isValid) {
+      if (!isValid && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('File does not match: hash mismatch'), backgroundColor: Colors.red),
@@ -999,17 +999,21 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
         return _softwareHashes[key]?.containsKey(fileName) ?? false;
       }).toList();
 
-      if (filesToCopy.isEmpty && entity is File) {
+      if (filesToCopy.isEmpty && entity is File && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('File ${path.basename(entity.path)} not found in server configuration'), backgroundColor: Colors.red),
         );
         return;
       }
-
-      Navigator.pop(context);
-      showDialog(context: context, barrierDismissible: false, builder: (context) => SimpleLoadingDialog(title: 'Copying ${path.basename(entity.path)}'));
-
+      if(mounted) {
+        Navigator.pop(context);
+        showDialog(context: context,
+            barrierDismissible: false,
+            builder: (context) =>
+                SimpleLoadingDialog(
+                    title: 'Copying ${path.basename(entity.path)}'));
+      }
       final finalDestPath = path.join(destinationPath, brand, model);
       if (!await Directory(finalDestPath).exists()) {
         await Directory(finalDestPath).create(recursive: true);
@@ -1164,7 +1168,7 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
 
       // Validate all files before copying
       final isValid = await _validateFiles(filesToValidate, brand, model);
-      if (!isValid) {
+      if (!isValid && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('File does not match: hash mismatch'), backgroundColor: Colors.red),
@@ -1179,17 +1183,21 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
         return _softwareHashes[key]?.containsKey(fileName) ?? false;
       }).toList();
 
-      if (filesToCopy.isEmpty) {
+      if (filesToCopy.isEmpty && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No files match server configuration'), backgroundColor: Colors.red),
         );
         return;
       }
-
-      Navigator.pop(context);
-      showDialog(context: context, barrierDismissible: false, builder: (context) => const SimpleLoadingDialog(title: 'Copying all items'));
-
+      if(mounted) {
+        Navigator.pop(context);
+        showDialog(context: context,
+            barrierDismissible: false,
+            builder: (context) =>
+            const SimpleLoadingDialog(
+                title: 'Copying all items'));
+      }
       final finalDestPath = path.join(destinationPath, brand, model);
       if (!await Directory(finalDestPath).exists()) {
         await Directory(finalDestPath).create(recursive: true);
@@ -1265,9 +1273,11 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
       }
       if (mounted) {
         await _loadBackupContents();
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted: ${path.basename(entity.path)}'), backgroundColor: Colors.green));
-      }
+        if(mounted){
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted: ${path.basename(entity.path)}'), backgroundColor: Colors.green));
+        }
+          }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
@@ -1349,13 +1359,13 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.white.withOpacity(0.8), Colors.grey.shade100.withOpacity(0.9)],
+                  colors: [Colors.white.withValues(alpha: 0.8), Colors.grey.shade100.withValues(alpha:0.9)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(32),
-                boxShadow: [BoxShadow(color: Colors.grey.shade300.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
-                border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+                boxShadow: [BoxShadow(color: Colors.grey.shade300.withValues(alpha:0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                border: Border.all(color: Colors.white.withValues(alpha:0.2), width: 1),
               ),
               child: Lottie.asset('assets/animations/folder_animation.json', width: 160, height: 160, fit: BoxFit.contain, repeat: true),
             ),
@@ -1377,11 +1387,11 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
                   label: const Text('Browse Files & Folders'),
                   style: ButtonStyle(
                     padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 16)),
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) => states.contains(WidgetState.hovered) ? const Color(0xFF10B981).withOpacity(0.9) : const Color(0xFF10B981)),
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) => states.contains(WidgetState.hovered) ? const Color(0xFF10B981).withValues(alpha:0.9) : const Color(0xFF10B981)),
                     foregroundColor: WidgetStateProperty.all(Colors.white),
                     elevation: WidgetStateProperty.resolveWith<double>((states) => states.contains(WidgetState.hovered) ? 8 : 4),
                     shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-                    shadowColor: MaterialStateProperty.all(Colors.grey.shade300.withOpacity(0.5)),
+                    shadowColor: WidgetStateProperty.all(Colors.grey.shade300.withValues(alpha:0.5)),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -1391,11 +1401,11 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
                   label: const Text('Quick Folder Select'),
                   style: ButtonStyle(
                     padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 16)),
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) => states.contains(WidgetState.hovered) ? Colors.blue.shade600.withOpacity(0.9) : Colors.blue.shade600),
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) => states.contains(WidgetState.hovered) ? Colors.blue.shade600.withValues(alpha:0.9) : Colors.blue.shade600),
                     foregroundColor: WidgetStateProperty.all(Colors.white),
                     elevation: WidgetStateProperty.resolveWith<double>((states) => states.contains(WidgetState.hovered) ? 8 : 4),
                     shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-                    shadowColor: MaterialStateProperty.all(Colors.grey.shade300.withOpacity(0.5)),
+                    shadowColor: WidgetStateProperty.all(Colors.grey.shade300.withValues(alpha:0.5)),
                   ),
                 ),
               ],
@@ -1419,7 +1429,7 @@ class _BackupViewerScreenState extends State<BackupViewerScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Text('Location: ${_selectedBackupDir!.path}', style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
-          ..._contents.map(_buildBackupItem).toList(),
+          ..._contents.map(_buildBackupItem),
         ],
       ),
       floatingActionButton: _selectedBackupDir != null ? FloatingActionButton(onPressed: _loadBackupContents, child: const Icon(Icons.refresh)) : null,
