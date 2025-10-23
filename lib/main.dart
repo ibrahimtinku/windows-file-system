@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:server/screens/backup_viewer_screen.dart';
 import 'package:server/services/clipboard_service.dart';
 import 'package:server/utils/folder_manager.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final folderManager = FolderManager();
   await folderManager.initializeAppFolders();
-
+  await SharedPreferences.getInstance();
   ClipboardService();
-
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -45,11 +44,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: BackupViewerScreen(),
+      home: const BackupViewerScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
-
-
-
