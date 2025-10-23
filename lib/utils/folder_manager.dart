@@ -10,18 +10,15 @@ class FolderManager {
   static const String logFileName = 'operations.log';
   static const String modelLogFileName = 'model_operations.log';
   final ConfigService configService = ConfigService();
-
+  String? _appDataPath;
 
 
   Future<String> get appDataPath async {
-    if (Platform.isWindows) {
-      // Directly use the D: drive path for Windows
-      return path.join(r'D:',  'SoftwareFile');
+    if (_appDataPath == null) {
+      final appDir = await getApplicationDocumentsDirectory();
+      _appDataPath = path.join(appDir.path, 'SecureFileManager');
     }
-
-    // Fallback to original behavior for other platforms
-    final directory = await getApplicationDocumentsDirectory();
-    return path.join(directory.path, 'SoftwareFile');
+    return _appDataPath!;
   }
 
   Future<List<String>> getBrands() async {
